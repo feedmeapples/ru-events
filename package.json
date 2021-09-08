@@ -25,6 +25,7 @@
   },
   "name": "ru-events",
   "dependencies": {
+    "scrape-it": "^5.3.2",
     "temporalio": "^0.4.1"
   }
 }
