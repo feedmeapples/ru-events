@@ -1,3 +1,6 @@
-export async function greet(name: string): Promise<string> {
-  return `Hello, ${name}!`;
+import { fetchEventsEventCartel } from "./scrapers";
+import { Event } from "./models/event";
+
+export async function fetchEvents(): Promise<Event[]> {
+  return await fetchEventsEventCartel();
 }

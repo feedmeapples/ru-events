@@ -1,5 +1,5 @@
 import { Connection, WorkflowClient } from '@temporalio/client';
-import { Example } from './interfaces/workflows';
+import { RuEventsWorkflow } from './interfaces/workflows';
 
 async function run() {
   // Connect to localhost with default ConnectionOptions,
@@ -9,9 +9,9 @@ async function run() {
   // via options passed the WorkflowClient constructor.
   const client = new WorkflowClient(connection.service);
   // Create a typed client using the Example Workflow interface,
-  const example = client.stub<Example>('example', { taskQueue: 'tutorial' });
-  const result = await example.execute('Temporal');
-  console.log(result); // Hello, Temporal!
+  const ruEventsWorkflow = client.stub<RuEventsWorkflow>('ru-events-workflow', { taskQueue: 'ru-events' });
+  const result = await ruEventsWorkflow.execute();
+  console.log(result);
 }
 
 run().catch((err) => {
