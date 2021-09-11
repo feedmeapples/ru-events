@@ -1,5 +1,6 @@
 export interface Event {
-    title: string;
-    url: string;
-    city: string
+  title: string;
+  url: string;
+  city: string;
+  date: Date;
 }
