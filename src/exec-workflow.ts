@@ -9,9 +9,7 @@ async function run() {
   // via options passed the WorkflowClient constructor.
   const client = new WorkflowClient(connection.service);
   // Create a typed client using the Example Workflow interface,
-  const wf = client.createWorkflowHandle(ruEventsWorkflow, { taskQueue: 'ru-events' });
-  const result = await wf.execute();
-  console.log(result);
+  return client.createWorkflowHandle(ruEventsWorkflow, { taskQueue: 'ru-events' }).execute();
 }
 
 run().catch((err) => {

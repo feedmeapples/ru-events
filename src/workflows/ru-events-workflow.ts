@@ -1,11 +1,14 @@
 import {
   createActivityHandle,
   createChildWorkflowHandle,
+  ApplicationFailure,
 } from "@temporalio/workflow";
-import { RuEventsWorkflow } from "../interfaces/workflows";
-import * as activities from "../activities";
+
 import { Event, Tour } from "../models";
+import * as activities from "../activities";
+import { RuEventsWorkflow } from "../interfaces/workflows";
 import { publishTourWorkflow } from "./publish-tour-workflow";
+import { sleep } from "../features";
 
 const { fetchEvents } = createActivityHandle<typeof activities>({
   startToCloseTimeout: "30 minutes",
@@ -26,12 +29,24 @@ export const ruEventsWorkflow: RuEventsWorkflow = () => {
             if (e) {
               continue;
             } else {
-              // TODO signal the tour's workflow about the new event
+              try {
+                await t.workflow.signal.publishEvent(event);
+                t.events.push(event);
+              } catch (err) {
+                console.error(err);
+                throw err;
+              }
             }
           } else {
             const publishTour = createChildWorkflowHandle(publishTourWorkflow);
             const keywords = event.title.split(" ");
-            await publishTour.execute(keywords);
+            await publishTour.start(event);
+            const tour: Tour = {
+              keywords: keywords,
+              workflow: publishTour,
+              events: [event],
+            };
+            tours.push(tour);
           }
         }
 
@@ -76,8 +91,4 @@ function findEvent(event: Event, events: Event[]): Event | null {
   }
 
   return null;
-}
-
-async function sleep(seconds: number) {
-  return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
 }

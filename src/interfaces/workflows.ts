@@ -1,7 +1,12 @@
+import { Event } from "../models"
+
 export type RuEventsWorkflow = () => {
   execute(): Promise<void>;
 }
 
-export type PublishTourWorkflow = (keywords: string[]) =>  {
+export type PublishTourWorkflow = (event: Event) =>  {
   execute(): Promise<void>;
+  signals: {
+    publishEvent(event: Event): void;
+  };
 }
