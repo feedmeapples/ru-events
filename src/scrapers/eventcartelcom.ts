@@ -46,5 +46,6 @@ async function fetchEventDetails(url: string): Promise<Event> {
     date,
     city,
     url,
+    publisher: _url
   };
 }

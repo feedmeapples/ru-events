@@ -14,31 +14,20 @@ const { fetchEvents } = createActivityHandle<typeof activities>({
 export const ruEventsWorkflow: RuEventsWorkflow = () => {
   const tours: Tour[] = [];
 
-  const findTourByEvent = (event: Event) => {
-    for (const t of tours) {
-      for (const e of t.events) {
-        if (
-          e.title === event.title &&
-          e.date === event.date &&
-          e.city === event.city
-        ) {
-          return t;
-        }
-      }
-    }
-
-    return undefined;
-  };
-
   return {
     async execute(): Promise<void> {
       while (true) {
         const events = await fetchEvents();
 
         for (const event of events) {
-          const tour = findTourByEvent(event);
-          if (tour) {
-            // TODO signal the tour's workflow about the new event
+          const t = findTourByEvent(event, tours);
+          if (t) {
+            const e = findEvent(event, t.events);
+            if (e) {
+              continue;
+            } else {
+              // TODO signal the tour's workflow about the new event
+            }
           } else {
             const publishTour = createChildWorkflowHandle(publishTourWorkflow);
             const keywords = event.title.split(" ");
@@ -51,6 +40,43 @@ export const ruEventsWorkflow: RuEventsWorkflow = () => {
     },
   };
 };
+
+function findTourByEvent(event: Event, tours: Tour[]): Tour | null {
+  for (const t of tours) {
+    for (const e of t.events) {
+      if (
+        e.title === event.title &&
+        e.date === event.date &&
+        e.city === event.city
+      ) {
+        return t;
+      }
+    }
+  }
+
+  return null;
+}
+
+function findEvent(event: Event, events: Event[]): Event | null {
+  events = events.filter(
+    (e) =>
+      e.publisher === event.publisher &&
+      e.date === event.date &&
+      e.city == event.city
+  );
+
+  if (events.length > 1) {
+    throw new Error(
+      `found ${events.length} events with the same params: ${event.publisher} ${event.date} ${event.city}`
+    );
+  }
+
+  if (events.length == 1) {
+    return events[0];
+  }
+
+  return null;
+}
 
 async function sleep(seconds: number) {
   return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
