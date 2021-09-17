@@ -1,3 +1,7 @@
 export type RuEventsWorkflow = () => {
-  execute(): Promise<string[]>;
+  execute(): Promise<void>;
+}
+
+export type PublishTourWorkflow = (keywords: string[]) =>  {
+  execute(): Promise<void>;
 }

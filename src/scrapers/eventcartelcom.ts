@@ -1,5 +1,5 @@
 import * as scrapeIt from "scrape-it";
-import { Event } from "../models/event";
+import { Event } from "../models";
 
 const _url = "https://eventcartel.com"
 
