@@ -1,15 +1,19 @@
 import * as scrapeIt from "scrape-it";
 import { Event } from "../models";
 
-const _url = "https://eventcartel.com"
+const _url = "https://eventcartel.com";
 
 export async function fetchEvents(): Promise<Event[]> {
   const urls = await fetchEventUrls();
 
   const events: Event[] = [];
   for (const url of urls) {
-    const event = await fetchEventDetails(url);
-    events.push(event);
+    try {
+      const event = await fetchEventDetails(url);
+      events.push(event);
+    } catch (err) {
+      console.warn(err);
+    }
   }
 
   return events;
@@ -41,11 +45,29 @@ async function fetchEventDetails(url: string): Promise<Event> {
 
   const { title, date, city } = data as any;
 
-  return {
-    title,
-    date,
-    city,
-    url,
-    publisher: _url
-  };
+  const event: Event = { title, date, city, url, publisher: _url };
+
+  validateEvent(event);
+
+  return event;
+}
+
+function validateEvent(event: Event) {
+  if (!event.title) {
+    throw new Error(`event title is not set, URL: ${event.url}`);
+  }
+  if (!event.city) {
+    throw new Error(`event city is not set, URL: ${event.url}`);
+  }
+  if (!event.url) {
+    throw new Error(`event url is not set, URL: ${event.url}`);
+  }
+  if (!event.date) {
+    throw new Error(`event date is not set, URL: ${event.url}`);
+  } else if (event.date < new Date()) {
+    throw new Error(`event date is in the past, date: ${event.date}, URL: ${event.url}`);
+  }
+  if (!event.publisher) {
+    throw new Error(`event publisher is not set, URL: ${event.url}`);
+  }
 }
