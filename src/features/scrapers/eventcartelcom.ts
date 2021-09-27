@@ -1,5 +1,6 @@
 import * as scrapeIt from "scrape-it";
 import { Event } from "../../models";
+import { extractCity } from "./utils";
 
 const _url = "https://eventcartel.com";
 
@@ -47,7 +48,10 @@ async function fetchEvent(url: string): Promise<Event> {
   const { data } = await scrapeIt.default(url, {
     title: ".event-title",
     date: ".event_calendar_dark",
-    city: ".place_address_dark",
+    city: {
+      selector: ".place_address_dark",
+      convert: extractCity,
+    },
   });
 
   const { title, date, city } = data as any;
@@ -64,7 +68,10 @@ export async function fetchEventsFromTourPage(url: string): Promise<Event[]> {
       listItem: ".tour-event-list .tr",
       data: {
         date: ".date",
-        city: ".address",
+        city: {
+          selector: ".address",
+          convert: extractCity,
+        },
       },
     },
   });
