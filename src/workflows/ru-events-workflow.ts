@@ -8,7 +8,7 @@ import { Event, Tour } from "../models";
 import * as activities from "../activities";
 import { RuEventsWorkflow } from "../interfaces/workflows";
 import { publishTourWorkflow } from "./publish-tour-workflow";
-import { sleep } from "../features";
+import { sleep } from "../features/sleep";
 
 const { fetchEvents } = createActivityHandle<typeof activities>({
   startToCloseTimeout: "30 minutes",
