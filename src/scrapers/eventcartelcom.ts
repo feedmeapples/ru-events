@@ -8,11 +8,18 @@ export async function fetchEvents(): Promise<Event[]> {
 
   const events: Event[] = [];
   for (const url of urls) {
+    const event = await fetchEvent(url);
     try {
-      const event = await fetchEventDetails(url);
+      validateEvent(event);
       events.push(event);
     } catch (err) {
-      console.warn(err);
+      const tourEvents = await fetchEventsFromTourPage(url);
+      try {
+        tourEvents.forEach(validateEvent);
+        events.push(...tourEvents);
+      } catch {
+        console.warn(err);
+      }
     }
   }
 
@@ -36,7 +43,7 @@ async function fetchEventUrls(): Promise<string[]> {
   return urls;
 }
 
-async function fetchEventDetails(url: string): Promise<Event> {
+async function fetchEvent(url: string): Promise<Event> {
   const { data } = await scrapeIt.default(url, {
     title: ".event-title",
     date: ".event_calendar_dark",
@@ -47,9 +54,32 @@ async function fetchEventDetails(url: string): Promise<Event> {
 
   const event: Event = { title, date, city, url, publisher: _url };
 
-  validateEvent(event);
-
   return event;
+}
+
+export async function fetchEventsFromTourPage(url: string): Promise<Event[]> {
+  const { data } = await scrapeIt.default(url, {
+    title: ".tour-page-head h3",
+    events: {
+      listItem: ".tour-event-list .tr",
+      data: {
+        date: ".date",
+        city: ".address",
+      },
+    },
+  });
+
+  const { title, events: eventsRaw } = data as any;
+
+  const events: Event[] = eventsRaw.map((e: any) => ({
+    title,
+    city: e.city,
+    date: e.date,
+    url,
+    publisher: _url,
+  }));
+
+  return events;
 }
 
 function validateEvent(event: Event) {
@@ -65,7 +95,9 @@ function validateEvent(event: Event) {
   if (!event.date) {
     throw new Error(`event date is not set, URL: ${event.url}`);
   } else if (event.date < new Date()) {
-    throw new Error(`event date is in the past, date: ${event.date}, URL: ${event.url}`);
+    throw new Error(
+      `event date is in the past, date: ${event.date}, URL: ${event.url}`
+    );
   }
   if (!event.publisher) {
     throw new Error(`event publisher is not set, URL: ${event.url}`);
