@@ -1,4 +1,4 @@
-import { fetchEventsEventCartel } from "./scrapers";
+import { fetchEventsEventCartel } from "./features/scrapers";
 import { Event } from "./models/event";
 
 export async function fetchEvents(): Promise<Event[]> {

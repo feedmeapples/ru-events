@@ -2,7 +2,7 @@ import { PublishTourWorkflow } from "../interfaces/workflows";
 import { createActivityHandle } from "@temporalio/workflow";
 import * as activities from "../activities";
 import { Event } from "../models";
-import { sleep } from "../features";
+import { sleep } from "../features/sleep";
 
 /** Workflow that publishes and tracks a tour of events */
 export const publishTourWorkflow: PublishTourWorkflow = (event: Event) => {
