@@ -5,9 +5,9 @@ process.env.TZ = "UTC";
 const config: Config.InitialOptions = {
   preset: "ts-jest",
   testEnvironment: "node",
-  testTimeout: 10000,
+  testTimeout: 20000,
   timers: "fake",
-  testRegex: "\\.e2e\\.ts$",
+  testRegex: "./src/.*\\.e2e\\.ts$",
 };
 
 export default config;
