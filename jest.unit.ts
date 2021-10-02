@@ -7,6 +7,7 @@ const config: Config.InitialOptions = {
   testEnvironment: "node",
   testTimeout: 10000,
   timers: "fake",
+  testRegex: "./src/.*\\.test\\.ts$",
 };
 
 export default config;
