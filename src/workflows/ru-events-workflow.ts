@@ -9,6 +9,7 @@ import * as activities from "../activities";
 import { RuEventsWorkflow } from "../interfaces/workflows";
 import { publishTourWorkflow } from "./publish-tour-workflow";
 import { sleep } from "../features/sleep";
+import { isSameTour } from "../features/similarity";
 
 const { fetchEvents } = createActivityHandle<typeof activities>({
   startToCloseTimeout: "30 minutes",
@@ -58,14 +59,9 @@ export const ruEventsWorkflow: RuEventsWorkflow = () => {
 
 function findTourByEvent(event: Event, tours: Tour[]): Tour | null {
   for (const t of tours) {
-    for (const e of t.events) {
-      if (
-        e.title === event.title &&
-        e.date === event.date &&
-        e.city === event.city
-      ) {
-        return t;
-      }
+    const same = t.events.some((e) => isSameTour(e.title, event.title));
+    if (same) {
+      return t;
     }
   }
 

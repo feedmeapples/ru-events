@@ -12,12 +12,15 @@
     "e2e": "jest -c jest.e2e.ts"
   },
   "dependencies": {
+    "cyrillic-to-translit-js": "^3.1.0",
     "scrape-it": "^5.3.2",
+    "string-similarity": "^4.0.4",
     "temporalio": "^0.4.3"
   },
   "devDependencies": {
     "@tsconfig/node16": "^1.0.0",
     "@types/jest": "^27.0.1",
+    "@types/string-similarity": "^4.0.0",
     "jest": "^27.1.0",
     "nodemon": "^2.0.12",
     "ts-jest": "^27.0.5",
