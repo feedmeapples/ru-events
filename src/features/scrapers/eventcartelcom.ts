@@ -15,11 +15,14 @@ export async function fetchEvents(): Promise<Event[]> {
       events.push(event);
     } catch (err) {
       const tourEvents = await fetchEventsFromTourPage(url);
-      try {
-        tourEvents.forEach(validateEvent);
-        events.push(...tourEvents);
-      } catch {
-        console.warn(err);
+
+      for (const e of tourEvents) {
+        try {
+          validateEvent(e);
+          events.push(e);
+        } catch (err) {
+          console.warn(err);
+        }
       }
     }
   }
