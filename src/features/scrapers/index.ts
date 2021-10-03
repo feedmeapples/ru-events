@@ -1,1 +1,1 @@
-export { fetchEvents as fetchEventsEventCartel } from "./eventcartelcom";
+export { getEvents as fetchEventsEventCartel } from "./eventcartelcom";
