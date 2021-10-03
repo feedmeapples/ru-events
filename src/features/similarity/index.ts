@@ -1,1 +1,1 @@
-export { isSameTour } from "./similarity";
+export { isSameTour, cleanText } from "./similarity";

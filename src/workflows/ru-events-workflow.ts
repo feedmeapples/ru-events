@@ -1,7 +1,6 @@
 import {
   createActivityHandle,
   createChildWorkflowHandle,
-  ApplicationFailure,
 } from "@temporalio/workflow";
 
 import { Event, Tour } from "../models";
@@ -9,7 +8,7 @@ import * as activities from "../activities";
 import { RuEventsWorkflow } from "../interfaces/workflows";
 import { publishTourWorkflow } from "./publish-tour-workflow";
 import { sleep } from "../features/sleep";
-import { isSameTour } from "../features/similarity";
+import { isSameTour, cleanText } from "../features/similarity";
 
 const { fetchEvents } = createActivityHandle<typeof activities>({
   startToCloseTimeout: "30 minutes",
@@ -39,7 +38,10 @@ export const ruEventsWorkflow: RuEventsWorkflow = () => {
               }
             }
           } else {
-            const publishTour = createChildWorkflowHandle(publishTourWorkflow);
+            const workflowId = convertToId(event.title);
+            const publishTour = createChildWorkflowHandle(publishTourWorkflow, {
+              workflowId,
+            });
             const keywords = event.title.split(" ");
             await publishTour.start(event);
             const tour: Tour = {
@@ -87,4 +89,8 @@ function findEvent(event: Event, events: Event[]): Event | null {
   }
 
   return null;
+}
+
+function convertToId(title: string): string {
+  return cleanText(title).replace(/\s+/g, "-").substr(0, 64);
 }

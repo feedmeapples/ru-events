@@ -2,8 +2,8 @@ import { compareTwoStrings } from "string-similarity";
 import CyrillicToTranslit from "cyrillic-to-translit-js";
 
 export function isSameTour(event1: string, event2: string): boolean {
-  event1 = simplify(event1);
-  event2 = simplify(event2);
+  event1 = cleanText(event1);
+  event2 = cleanText(event2);
 
   const similarity = compareTwoStrings(event1, event2);
   return similarity > 0.6;
@@ -11,7 +11,7 @@ export function isSameTour(event1: string, event2: string): boolean {
 
 const exclude = [/tour/, /usa/, /\d{4}/];
 
-export function simplify(text: string): string {
+export function cleanText(text: string): string {
   const translit = new CyrillicToTranslit();
   text = translit.transform(text);
 

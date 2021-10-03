@@ -1,8 +1,8 @@
-import { simplify, isSameTour } from "./similarity";
+import { cleanText, isSameTour } from "./similarity";
 
-describe("simplify", () => {
+describe("cleanText", () => {
   test("should conver cyrillic to latin", () => {
-    const res = simplify(
+    const res = cleanText(
       "комбинированные материалы в которых применена щадящая оптимизация"
     );
     expect(res).toBe(
@@ -11,12 +11,12 @@ describe("simplify", () => {
   });
 
   test("should lowercase", () => {
-    const res = simplify("Create LICENSE");
+    const res = cleanText("Create LICENSE");
     expect(res).toBe("create license");
   });
 
   test("should remove special symbols", () => {
-    const res = simplify("create ¶   license > ... ! 2   ");
+    const res = cleanText("create ¶   license > ... ! 2   ");
     expect(res).toBe("create license 2");
   });
 });
