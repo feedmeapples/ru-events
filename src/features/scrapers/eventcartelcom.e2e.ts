@@ -1,15 +1,35 @@
-import { fetchEvents, fetchEventsFromTourPage } from "./eventcartelcom";
+import {
+  scrapeEventPage,
+  getEvents,
+  scrapeTourPage,
+  validateEvent,
+} from "./eventcartelcom";
 
-test("eventcartel.com events not empty", async () => {
-  const events = await fetchEvents();
+describe("eventcartel.com", () => {
+  test("eventcartel.com events not empty", async () => {
+    const events = await getEvents();
 
-  expect(events.length).toBeTruthy();
-});
+    expect(events.length).toBeTruthy();
+  });
 
-test("tour page not empty", async () => {
-  const events = await fetchEventsFromTourPage(
-    "https://eventcartel.com/events/prizhok-v-svobodu-istoria-rudolfa-nureeva-ballet-buy-tickets-124/"
-  );
+  test("tour page not empty", async () => {
+    const events = await scrapeTourPage(
+      "https://eventcartel.com/events/prizhok-v-svobodu-istoria-rudolfa-nureeva-ballet-buy-tickets-124/"
+    );
 
-  expect(events.length).toBeTruthy();
+    expect(events.length).toBeTruthy();
+  });
+
+
+  test("event page not empty", async () => {
+    const event = await scrapeEventPage(
+      "https://eventcartel.com/events/the-gamblers-by-nikolai-gogol-tickets-6130"
+    );
+    
+    expect(event?.title).toBeTruthy();
+    expect(event?.date.getFullYear() > 2000).toBeTruthy();
+    expect(event?.publisher).toBeTruthy();
+    expect(event?.city).toBeTruthy();
+    expect(event?.url).toBeTruthy();
+  });
 });

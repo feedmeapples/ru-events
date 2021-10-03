@@ -1,25 +1,25 @@
 import * as scrapeIt from "scrape-it";
 import { Event } from "../../models";
-import { extractCity, extractDate } from "./utils";
+import { extractCity, extractDate, extractDateValues } from "./utils";
 
 const _url = "https://eventcartel.com";
 
-export async function fetchEvents(): Promise<Event[]> {
-  const urls = await fetchEventUrls();
+export async function getEvents(): Promise<Event[]> {
+  const urls = await scrapeEventUrls();
 
   const events: Event[] = [];
   for (const url of urls) {
-    const event = await fetchEvent(url);
+    const event = await scrapeEventPage(url);
     try {
       validateEvent(event);
       events.push(event);
     } catch (err) {
-      const tourEvents = await fetchEventsFromTourPage(url);
+      const tourEvents = await scrapeTourPage(url);
 
-      for (const e of tourEvents) {
+      for (const tourEvent of tourEvents) {
         try {
-          validateEvent(e);
-          events.push(e);
+          validateEvent(tourEvent);
+          events.push(tourEvent);
         } catch (err) {
           console.warn(err);
         }
@@ -30,7 +30,7 @@ export async function fetchEvents(): Promise<Event[]> {
   return events;
 }
 
-async function fetchEventUrls(): Promise<string[]> {
+async function scrapeEventUrls(): Promise<string[]> {
   const { data } = await scrapeIt.default(`${_url}/events/`, {
     events: {
       listItem: ".all-events-item",
@@ -47,24 +47,29 @@ async function fetchEventUrls(): Promise<string[]> {
   return urls;
 }
 
-async function fetchEvent(url: string): Promise<Event> {
+export async function scrapeEventPage(url: string): Promise<Event> {
   const { data } = await scrapeIt.default(url, {
     title: ".event-title",
-    date: { selector: ".event_calendar_dark", convert: extractDate },
-    city: {
-      selector: ".place_address_dark",
-      convert: extractCity,
-    },
+    day: ".event_calendar_dark .date",
+    monthRaw: ".event_calendar_dark .month",
+    cityRaw: ".place_address_dark",
   });
 
-  const { title, date, city } = data as any;
+  const { title, day, monthRaw, cityRaw } = data as any;
+  let { year, month } = extractDateValues(monthRaw);
+  const city = extractCity(cityRaw) || "";
+
+  let date: Date = new Date(0);
+  if (year && month && day) {
+    date = new Date(year, month, day);
+  }
 
   const event: Event = { title, date, city, url, publisher: _url };
 
   return event;
 }
 
-export async function fetchEventsFromTourPage(url: string): Promise<Event[]> {
+export async function scrapeTourPage(url: string): Promise<Event[]> {
   const { data } = await scrapeIt.default(url, {
     title: ".tour-page-head h3",
     events: {
@@ -89,7 +94,7 @@ export async function fetchEventsFromTourPage(url: string): Promise<Event[]> {
   return events;
 }
 
-function validateEvent(event: Event) {
+export function validateEvent(event: Event) {
   if (!event.title) {
     throw new Error(`event title is not set, URL: ${event.url}`);
   }
