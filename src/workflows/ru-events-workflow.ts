@@ -26,29 +26,20 @@ export const ruEventsWorkflow: RuEventsWorkflow = () => {
         for (const event of events) {
           const t = findTourByEvent(event, tours);
           if (t) {
-            const e = findEvent(event, t.events);
-            if (e) {
-              continue;
-            } else {
-              try {
-                await t.workflow.signal.publishEvent(event);
-                t.events.push(event);
-              } catch (err) {
-                console.error(err);
-                throw err;
-              }
+            try {
+              await t.workflow.signal.publishEvent(event);
+            } catch (err) {
+              console.error(err);
             }
           } else {
             const workflowId = `${convertToId(event.title)}-${randString(4)}`;
             const publishTour = createChildWorkflowHandle(publishTourWorkflow, {
               workflowId,
             });
-            const keywords = event.title.split(" ");
             await publishTour.start(event);
             const tour: Tour = {
-              keywords: keywords,
+              keywords: event.title,
               workflow: publishTour,
-              events: [event],
             };
             tours.push(tour);
           }
@@ -60,36 +51,8 @@ export const ruEventsWorkflow: RuEventsWorkflow = () => {
   };
 };
 
-function findTourByEvent(event: Event, tours: Tour[]): Tour | null {
-  for (const t of tours) {
-    const same = t.events.some((e) => isSameTour(e.title, event.title));
-    if (same) {
-      return t;
-    }
-  }
-
-  return null;
-}
-
-function findEvent(event: Event, events: Event[]): Event | null {
-  events = events.filter(
-    (e) =>
-      e.publisher === event.publisher &&
-      e.date === event.date &&
-      e.city == event.city
-  );
-
-  if (events.length > 1) {
-    throw new Error(
-      `found ${events.length} events with the same params: ${event.publisher} ${event.date} ${event.city}`
-    );
-  }
-
-  if (events.length == 1) {
-    return events[0];
-  }
-
-  return null;
+function findTourByEvent(event: Event, tours: Tour[]) {
+  return tours.find((t) => isSameTour(t.keywords, event.title));
 }
 
 function convertToId(title: string): string {

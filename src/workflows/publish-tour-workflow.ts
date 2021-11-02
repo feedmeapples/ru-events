@@ -10,6 +10,10 @@ interface TelegramEvent extends Event {
 
 const { sendTelegramMessage } = createActivityHandle<typeof activities>({
   startToCloseTimeout: "1 minutes",
+  retry: {
+    initialInterval: "1m",
+    maximumAttempts: 10,
+  },
 });
 
 /** Workflow that publishes and tracks a tour of events */
@@ -29,14 +33,38 @@ export const publishTourWorkflow: PublishTourWorkflow = (event: Event) => {
           event.isPublished = true;
         }
 
-        sleep(1000);
+        expired = events.every((e) => new Date(e.date) < new Date());
+        sleep(10);
       }
-      expired = events.every((e) => new Date(e.date) >= new Date());
     },
     signals: {
       publishEvent: (event: Event) => {
-        events.push(event);
+        const e = findEvent(event, events);
+        if (!e) {
+          events.push(event);
+        }
       },
     },
   };
 };
+
+function findEvent(event: Event, events: Event[]): Event | null {
+  events = events.filter(
+    (e) =>
+      e.publisher === event.publisher &&
+      e.date === event.date &&
+      e.city == event.city
+  );
+
+  if (events.length > 1) {
+    throw new Error(
+      `found ${events.length} events with the same params: ${event.publisher} ${event.date} ${event.city}`
+    );
+  }
+
+  if (events.length == 1) {
+    return events[0];
+  }
+
+  return null;
+}

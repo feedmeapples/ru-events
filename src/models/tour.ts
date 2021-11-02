@@ -3,7 +3,6 @@ import { PublishTourWorkflow } from "../interfaces/workflows";
 import { Event } from "./event";
 
 export interface Tour {
-  keywords: string[]
-  events: Event[]
+  keywords: string
   workflow: ChildWorkflowHandle<PublishTourWorkflow>
 }
