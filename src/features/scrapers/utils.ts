@@ -23,7 +23,7 @@ export function extractDate(dateRaw: string) {
     return null;
   }
 
-  return new Date(year, month, day);
+  return new Date(year, month, day).toISOString();
 }
 
 export function extractDateValues(dateRaw: string): {

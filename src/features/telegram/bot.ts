@@ -13,7 +13,7 @@ if (!token) {
   throw new Error("TELEGRAM_TOKEN is not defined");
 }
 
-export function sendMessage(message: string) {
+export async function sendMessage(message: string) {
   const bot = new Bot(token);
-  bot.api.sendMessage(chatId, message);
+  await bot.api.sendMessage(chatId, message);
 }
