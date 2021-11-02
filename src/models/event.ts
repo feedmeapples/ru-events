@@ -3,5 +3,5 @@ export interface Event {
   publisher: string;
   url: string;
   city: string;
-  date: Date;
+  date: string;
 }

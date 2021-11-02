@@ -10,6 +10,14 @@ describe("eventcartel.com", () => {
     const events = await getEvents();
 
     expect(events.length).toBeTruthy();
+    for (const event of events) {
+      expect(event.title).toBeTruthy();
+      expect(event.date).toBeTruthy();
+      expect(new Date(event.date).getFullYear() > 2000).toBeTruthy();
+      expect(event.publisher).toBeTruthy();
+      expect(event.city).toBeTruthy();
+      expect(event.url).toBeTruthy();
+    }
   });
 
   test("tour page not empty", async () => {
@@ -18,6 +26,14 @@ describe("eventcartel.com", () => {
     );
 
     expect(events.length).toBeTruthy();
+    for (const event of events) {
+      expect(event.title).toBeTruthy();
+      expect(event.date).toBeTruthy();
+      expect(new Date(event.date).getFullYear() > 2000).toBeTruthy();
+      expect(event.publisher).toBeTruthy();
+      expect(event.city).toBeTruthy();
+      expect(event.url).toBeTruthy();
+    }
   });
 
 
@@ -27,7 +43,8 @@ describe("eventcartel.com", () => {
     );
     
     expect(event?.title).toBeTruthy();
-    expect(event?.date.getFullYear() > 2000).toBeTruthy();
+    expect(event.date).toBeTruthy();
+    expect(new Date(event.date).getFullYear() > 2000).toBeTruthy();
     expect(event?.publisher).toBeTruthy();
     expect(event?.city).toBeTruthy();
     expect(event?.url).toBeTruthy();

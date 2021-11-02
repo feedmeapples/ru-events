@@ -59,9 +59,9 @@ export async function scrapeEventPage(url: string): Promise<Event> {
   let { year, month } = extractDateValues(monthRaw);
   const city = extractCity(cityRaw) || "";
 
-  let date: Date = new Date(0);
+  let date = new Date(0).toISOString();
   if (year && month && day) {
-    date = new Date(year, month, day);
+    date = new Date(year, month, day).toISOString();
   }
 
   const event: Event = { title, date, city, url, publisher: _url };
@@ -106,7 +106,7 @@ export function validateEvent(event: Event) {
   }
   if (!event.date) {
     throw new Error(`event date is not set, URL: ${event.url}`);
-  } else if (event.date < new Date()) {
+  } else if (new Date(event.date) < new Date()) {
     throw new Error(
       `event date is in the past, date: ${event.date}, URL: ${event.url}`
     );
