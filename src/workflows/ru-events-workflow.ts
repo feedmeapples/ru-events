@@ -9,6 +9,7 @@ import { RuEventsWorkflow } from "../interfaces/workflows";
 import { publishTourWorkflow } from "./publish-tour-workflow";
 import { sleep } from "../features/sleep";
 import { isSameTour, cleanText } from "../features/similarity";
+import { randString } from "../features/randString";
 
 const { fetchEvents } = createActivityHandle<typeof activities>({
   startToCloseTimeout: "30 minutes",
@@ -38,7 +39,7 @@ export const ruEventsWorkflow: RuEventsWorkflow = () => {
               }
             }
           } else {
-            const workflowId = convertToId(event.title);
+            const workflowId = `${convertToId(event.title)}-${randString(4)}`;
             const publishTour = createChildWorkflowHandle(publishTourWorkflow, {
               workflowId,
             });
