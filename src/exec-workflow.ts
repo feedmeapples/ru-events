@@ -1,5 +1,5 @@
-import { Connection, WorkflowClient } from '@temporalio/client';
-import { ruEventsWorkflow } from './workflows';
+import { Connection, WorkflowClient } from "@temporalio/client";
+import { ruEventsWorkflow } from "./workflows";
 
 async function run() {
   // Connect to localhost with default ConnectionOptions,
@@ -9,7 +9,9 @@ async function run() {
   // via options passed the WorkflowClient constructor.
   const client = new WorkflowClient(connection.service);
   // Create a typed client using the Example Workflow interface,
-  return client.createWorkflowHandle(ruEventsWorkflow, { taskQueue: 'ru-events' }).execute();
+  return client
+    .createWorkflowHandle(ruEventsWorkflow, { taskQueue: "ru-events" })
+    .start();
 }
 
 run().catch((err) => {
