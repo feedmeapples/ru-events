@@ -1,8 +1,7 @@
-import { ChildWorkflowHandle } from '@temporalio/workflow'
-import { PublishTourWorkflow } from "../interfaces/workflows";
-import { Event } from "./event";
-
 export interface Tour {
-  keywords: string
-  workflow: ChildWorkflowHandle<PublishTourWorkflow>
+  keywords: string;
+  workflow: {
+    id: string;
+    runId: string;
+  };
 }
