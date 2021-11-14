@@ -1,9 +1,4 @@
-import {
-  scrapeEventPage,
-  getEvents,
-  scrapeTourPage,
-  validateEvent,
-} from "./eventcartelcom";
+import { scrapeEventPage, getEvents, scrapeTourPage } from "./eventcartelcom";
 
 describe("eventcartel.com", () => {
   test("eventcartel.com events not empty", async () => {
@@ -36,12 +31,11 @@ describe("eventcartel.com", () => {
     }
   });
 
-
   test("event page not empty", async () => {
     const event = await scrapeEventPage(
       "https://eventcartel.com/events/the-gamblers-by-nikolai-gogol-tickets-6130"
     );
-    
+
     expect(event?.title).toBeTruthy();
     expect(event.date).toBeTruthy();
     expect(new Date(event.date).getFullYear() > 2000).toBeTruthy();

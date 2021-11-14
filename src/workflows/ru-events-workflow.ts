@@ -1,55 +1,56 @@
 import {
-  createActivityHandle,
-  createChildWorkflowHandle,
+  proxyActivities,
+  startChild,
+  getExternalWorkflowHandle,
 } from "@temporalio/workflow";
 
 import { Event, Tour } from "../models";
 import * as activities from "../activities";
-import { RuEventsWorkflow } from "../interfaces/workflows";
-import { publishTourWorkflow } from "./publish-tour-workflow";
+import {
+  publishEventSignal,
+  publishTourWorkflow,
+} from "./publish-tour-workflow";
 import { sleep } from "../features/sleep";
 import { isSameTour, cleanText } from "../features/similarity";
 import { randString } from "../features/randString";
 
-const { fetchEvents } = createActivityHandle<typeof activities>({
+const { fetchEvents } = proxyActivities<typeof activities>({
   startToCloseTimeout: "30 minutes",
 });
 
-export const ruEventsWorkflow: RuEventsWorkflow = () => {
-  const tours: Tour[] = [];
+const tours: Tour[] = [];
 
-  return {
-    async execute(): Promise<void> {
-      while (true) {
-        const events = await fetchEvents();
+export async function ruEventsWorkflow(): Promise<void> {
+  while (true) {
+    const events = await fetchEvents();
 
-        for (const event of events) {
-          const t = findTourByEvent(event, tours);
-          if (t) {
-            try {
-              await t.workflow.signal.publishEvent(event);
-            } catch (err) {
-              console.error(err);
-            }
-          } else {
-            const workflowId = `${convertToId(event.title)}-${randString(4)}`;
-            const publishTour = createChildWorkflowHandle(publishTourWorkflow, {
-              workflowId,
-            });
-            await publishTour.start(event);
-            const tour: Tour = {
-              keywords: event.title,
-              workflow: publishTour,
-            };
-            tours.push(tour);
-          }
+    for (const event of events) {
+      const t = findTourByEvent(event, tours);
+      if (t) {
+        try {
+          const wf = getExternalWorkflowHandle(t.workflow.id);
+
+          await wf.signal(publishEventSignal, event);
+        } catch (err) {
+          console.error(err);
         }
-
-        await sleep(100);
+      } else {
+        const workflowId = `${convertToId(event.title)}-${randString(4)}`;
+        const run = await startChild(publishTourWorkflow, {
+          workflowId,
+          args: [event],
+        });
+        const tour: Tour = {
+          keywords: event.title,
+          workflow: { id: workflowId, runId: run.originalRunId },
+        };
+        tours.push(tour);
       }
-    },
-  };
-};
+    }
+
+    await sleep(100);
+  }
+}
 
 function findTourByEvent(event: Event, tours: Tour[]) {
   return tours.find((t) => isSameTour(t.keywords, event.title));

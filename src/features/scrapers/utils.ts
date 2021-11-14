@@ -1,4 +1,4 @@
-import { cities, months, Month } from "../../models";
+import { cities, months, Event } from "../../models";
 
 export function extractCity(address: string) {
   for (const cityName in cities) {
@@ -77,4 +77,26 @@ export function extractDateValues(dateRaw: string): {
   }
 
   return { year, month, day };
+}
+
+export function validateEvent(event: Event) {
+  if (!event.title) {
+    throw new Error(`event title is not set. URL: ${event.url}`);
+  }
+  if (!event.city) {
+    throw new Error(`event city is not set. URL: ${event.url}`);
+  }
+  if (!event.url) {
+    throw new Error(`event url is not set. URL: ${event.url}`);
+  }
+  if (!event.date) {
+    throw new Error(`event date is not set. URL: ${event.url}`);
+  } else if (new Date(event.date) < new Date()) {
+    throw new Error(
+      `event date is in the past, Date: ${event.date}. URL: ${event.url}`
+    );
+  }
+  if (!event.publisher) {
+    throw new Error(`event publisher is not set. URL: ${event.url}`);
+  }
 }

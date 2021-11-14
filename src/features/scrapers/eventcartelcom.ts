@@ -1,6 +1,11 @@
 import * as scrapeIt from "scrape-it";
 import { Event } from "../../models";
-import { extractCity, extractDate, extractDateValues } from "./utils";
+import {
+  extractCity,
+  extractDate,
+  extractDateValues,
+  validateEvent,
+} from "./utils";
 
 const _url = "https://eventcartel.com";
 
@@ -92,26 +97,4 @@ export async function scrapeTourPage(url: string): Promise<Event[]> {
   }));
 
   return events;
-}
-
-export function validateEvent(event: Event) {
-  if (!event.title) {
-    throw new Error(`event title is not set, URL: ${event.url}`);
-  }
-  if (!event.city) {
-    throw new Error(`event city is not set, URL: ${event.url}`);
-  }
-  if (!event.url) {
-    throw new Error(`event url is not set, URL: ${event.url}`);
-  }
-  if (!event.date) {
-    throw new Error(`event date is not set, URL: ${event.url}`);
-  } else if (new Date(event.date) < new Date()) {
-    throw new Error(
-      `event date is in the past, date: ${event.date}, URL: ${event.url}`
-    );
-  }
-  if (!event.publisher) {
-    throw new Error(`event publisher is not set, URL: ${event.url}`);
-  }
 }
