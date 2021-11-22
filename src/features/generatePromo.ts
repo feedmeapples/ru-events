@@ -2,16 +2,19 @@ import { Event, months } from "../models";
 
 export function generatePromoText(events: Event[]) {
   if (events.length === 0) {
-    return ""
+    return "";
   }
-  
-  const messages: string[] = [];
+
+  const title = events[0].title;
+
+  const eventsTxt: string[] = [];
   for (let event of events) {
     const date = new Date(event.date);
     const day = date.getDate();
     const monthIdx = date.getMonth();
     const month = months[monthIdx].abbr;
-    messages.push(`${event.title} - ${event.city} - ${month} ${day}`);
+    eventsTxt.push(`${event.city?.icon} ${month}. ${day} ${event.city?.name}`);
   }
-  return messages.join("\n\n");
+
+  return `✨${title}\n\n${eventsTxt.join("\n")}`;
 }

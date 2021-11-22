@@ -1,7 +1,9 @@
+import { City } from "./city";
+
 export interface Event {
   title: string;
   publisher: string;
   url: string;
-  city: string;
+  city: City | null;
   date: string;
 }
