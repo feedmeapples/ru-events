@@ -62,7 +62,7 @@ export async function scrapeEventPage(url: string): Promise<Event> {
 
   const { title, day, monthRaw, cityRaw } = data as any;
   let { year, month } = extractDateValues(monthRaw);
-  const city = extractCity(cityRaw) || "";
+  const city = extractCity(cityRaw);
 
   let date = new Date(0).toISOString();
   if (year && month && day) {

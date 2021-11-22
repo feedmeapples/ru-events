@@ -1,6 +1,6 @@
-import { cities, months, Event } from "../../models";
+import { cities, City, months, Event } from "../../models";
 
-export function extractCity(address: string) {
+export function extractCity(address: string): City | null {
   for (const cityName in cities) {
     const city = cities[cityName];
 
@@ -8,7 +8,7 @@ export function extractCity(address: string) {
       const regex = new RegExp(`\\b${alias}\\b`, "i");
 
       if (regex.test(address)) {
-        return cityName;
+        return city;
       }
     }
   }
