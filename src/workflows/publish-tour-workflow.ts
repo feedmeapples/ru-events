@@ -11,7 +11,7 @@ interface TelegramEvent extends Event {
 
 export const publishEventSignal = wf.defineSignal<[Event]>("publishEvent");
 
-const { sendTelegramMessage } = wf.proxyActivities<
+const { sendTelegramMessage, updateTelegramMessage } = wf.proxyActivities<
   typeof activities
 >({
   startToCloseTimeout: "1 minutes",
@@ -25,17 +25,21 @@ const { sendTelegramMessage } = wf.proxyActivities<
 export async function publishTourWorkflow(event: Event): Promise<void> {
   wf.setHandler(publishEventSignal, publishEvent);
 
-  const events: TelegramEvent[] = [event];
+  let events: TelegramEvent[] = [event];
+  let messageId: number | undefined;
   let expired = false;
 
   while (!expired) {
-    for (let event of events) {
-      if (event.isPublished) {
-        continue;
+
+    const anyNewEvent = events.some((e) => !e.isPublished);
+    if (anyNewEvent) {
+      if (messageId) {
+        await updateTelegramMessage(messageId, events);
+      } else {
+        messageId = await sendTelegramMessage(events);
       }
 
-      await sendTelegramMessage(event);
-      event.isPublished = true;
+      events = events.map((e) => ({ ...e, isPublished: true }));
     }
 
     expired = events.every((e) => new Date(e.date) < new Date());

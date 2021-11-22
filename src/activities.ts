@@ -1,20 +1,17 @@
+import { generatePromoText } from "./features/generatePromo";
 import { fetchEventsEventCartel } from "./features/scrapers";
-import { sendMessage } from "./features/telegram/bot";
-import { Event, months } from "./models";
+import { sendMessage, updateMessage } from "./features/telegram/bot";
+import { Event } from "./models";
 
 export async function fetchEvents(): Promise<Event[]> {
   return await fetchEventsEventCartel();
 }
-export async function sendTelegramMessage(event: Event) {
-  const date =  new Date(event!.date)
-  const day = date.getDate()
-  const monthIdx = date.getMonth();
-  console.log(
-    `Sending message for ${event!.title}. m index ${monthIdx}, ${JSON.stringify(months[monthIdx])}`
-  );
-  const month = months[monthIdx].abbr;
-  
-  const message = `${event.title} - ${event.city} - ${month} ${day}`;
-  await sendMessage(message);
+export async function sendTelegramMessage(events: Event[]): Promise<number> {
+  const message = generatePromoText(events);
+  return await sendMessage(message);
 }
 
+export async function updateTelegramMessage(messageId: number, events: Event[]) {
+  const message = generatePromoText(events);
+  return await updateMessage(messageId, message);
+}
