@@ -7,7 +7,7 @@
     "build.watch": "tsc --build --watch",
     "start": "ts-node src/worker.ts",
     "start.watch": "nodemon src/worker.ts",
-    "workflow": "ts-node src/execute-workflow.ts",
+    "wf": "ts-node src/execute-workflow.ts",
     "test": "jest -c jest.unit.ts",
     "e2e": "jest -c jest.e2e.ts",
     "lint": "eslint ."
