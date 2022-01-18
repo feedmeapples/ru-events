@@ -83,6 +83,9 @@ export function validateEvent(event: Event) {
   if (!event.title) {
     throw new Error(`event title is not set. URL: ${event.url}`);
   }
+  if (!event.image) {
+    throw new Error(`event image is not set. URL: ${event.url}`);
+  }
   if (!event.city) {
     throw new Error(`event city is not set. URL: ${event.url}`);
   }
