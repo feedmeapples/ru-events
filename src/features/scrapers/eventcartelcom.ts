@@ -76,7 +76,7 @@ export async function scrapeEventPage(url: string): Promise<Event> {
 
 export async function scrapeTourPage(url: string): Promise<Event[]> {
   const { data } = await scrapeIt.default(url, {
-    title: ".tour-page-head h3",
+    title: ".tour-page-head .h3",
     events: {
       listItem: ".tour-event-list .tr",
       data: {
