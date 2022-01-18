@@ -8,10 +8,14 @@ export async function fetchEvents(): Promise<Event[]> {
 }
 export async function sendTelegramMessage(events: Event[]): Promise<number> {
   const message = generatePromoText(events);
-  return await sendMessage(message);
+  const pictureUrl = events?.[0].image;
+  return await sendMessage(message, pictureUrl);
 }
 
-export async function updateTelegramMessage(messageId: number, events: Event[]) {
+export async function updateTelegramMessage(
+  messageId: number,
+  events: Event[]
+) {
   const message = generatePromoText(events);
   return await updateMessage(messageId, message);
 }

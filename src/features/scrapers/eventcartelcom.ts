@@ -55,12 +55,16 @@ async function scrapeEventUrls(): Promise<string[]> {
 export async function scrapeEventPage(url: string): Promise<Event> {
   const { data } = await scrapeIt.default(url, {
     title: ".event-title",
+    image: {
+      selector: ".tour-page-image img",
+      attr: "src",
+    },
     day: ".event_calendar_dark .date",
     monthRaw: ".event_calendar_dark .month",
     cityRaw: ".place_address_dark",
   });
 
-  const { title, day, monthRaw, cityRaw } = data as any;
+  const { title, image, day, monthRaw, cityRaw } = data as any;
   let { year, month } = extractDateValues(monthRaw);
   const city = extractCity(cityRaw);
 
@@ -69,7 +73,7 @@ export async function scrapeEventPage(url: string): Promise<Event> {
     date = new Date(year, month, day).toISOString();
   }
 
-  const event: Event = { title, date, city, url, publisher: _url };
+  const event: Event = { title, image, date, city, url, publisher: _url };
 
   return event;
 }
@@ -77,6 +81,10 @@ export async function scrapeEventPage(url: string): Promise<Event> {
 export async function scrapeTourPage(url: string): Promise<Event[]> {
   const { data } = await scrapeIt.default(url, {
     title: ".tour-page-head .h3",
+    image: {
+      selector: ".tour-page-image img",
+      attr: "src",
+    },
     events: {
       listItem: ".tour-event-list .tr",
       data: {
@@ -86,10 +94,15 @@ export async function scrapeTourPage(url: string): Promise<Event[]> {
     },
   });
 
-  const { title, events: eventsRaw } = data as any;
+  let { title, image, events: eventsRaw } = data as any;
+
+  if (image.startsWith("/")) {
+    image = _url + image;
+  }
 
   const events: Event[] = eventsRaw.map((e: any) => ({
     title,
+    image,
     city: e.city,
     date: e.date,
     url,
