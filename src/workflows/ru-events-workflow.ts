@@ -2,6 +2,8 @@ import {
   proxyActivities,
   startChild,
   getExternalWorkflowHandle,
+  setHandler,
+  defineQuery,
 } from "@temporalio/workflow";
 
 import { Event, Tour } from "../models";
@@ -18,9 +20,13 @@ const { fetchEvents } = proxyActivities<typeof activities>({
   startToCloseTimeout: "30 minutes",
 });
 
-const tours: Tour[] = [];
+export const toursQuery = defineQuery<Tour[]>("tours");
 
 export async function ruEventsWorkflow(): Promise<void> {
+  const tours: Tour[] = [];
+
+  setHandler(toursQuery, () => tours);
+
   while (true) {
     const events = await fetchEvents();
 

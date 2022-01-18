@@ -1,4 +1,9 @@
-import * as wf from "@temporalio/workflow";
+import {
+  proxyActivities,
+  defineQuery,
+  defineSignal,
+  setHandler,
+} from "@temporalio/workflow";
 
 import * as activities from "../activities";
 import { Event } from "../models";
@@ -9,9 +14,7 @@ interface TelegramEvent extends Event {
   isPublished?: boolean;
 }
 
-export const publishEventSignal = wf.defineSignal<[Event]>("publishEvent");
-
-const { sendTelegramMessage, updateTelegramMessage } = wf.proxyActivities<
+const { sendTelegramMessage, updateTelegramMessage } = proxyActivities<
   typeof activities
 >({
   startToCloseTimeout: "1 minutes",
@@ -21,16 +24,19 @@ const { sendTelegramMessage, updateTelegramMessage } = wf.proxyActivities<
   },
 });
 
+export const publishEventSignal = defineSignal<[Event]>("publishEvent");
+export const eventsQuery = defineQuery<TelegramEvent[]>("events");
+
 /** Workflow that publishes and tracks a tour of events */
 export async function publishTourWorkflow(event: Event): Promise<void> {
-  wf.setHandler(publishEventSignal, publishEvent);
-
   let events: TelegramEvent[] = [event];
   let messageId: number | undefined;
   let expired = false;
 
-  while (!expired) {
+  setHandler(publishEventSignal, publishEvent);
+  setHandler(eventsQuery, () => events);
 
+  while (!expired) {
     const anyNewEvent = events.some((e) => !e.isPublished);
     if (anyNewEvent) {
       if (messageId) {
