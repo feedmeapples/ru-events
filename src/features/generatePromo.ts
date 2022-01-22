@@ -1,3 +1,4 @@
+import { InlineKeyboardButton } from "grammy/out/platform.node";
 import { Event, months } from "../models";
 
 export function generatePromoText(events: Event[]) {
@@ -16,5 +17,22 @@ export function generatePromoText(events: Event[]) {
     eventsTxt.push(`${event.city?.icon} ${month}. ${day} ${event.city?.name}`);
   }
 
-  return `✨${title}\n\n${eventsTxt.join("\n")}`;
+  return `✨${title}\n\n${eventsTxt.join("\n")}\n\n🎫 Билеты:`;
+}
+
+export function generatePromoButtons(events: Event[]): InlineKeyboardButton[] {
+  if (events.length === 0) {
+    return [];
+  }
+
+  let buttons = events.map((event) => ({
+    text: event.publisher,
+    url: event.url,
+  }));
+
+  buttons = buttons.filter(
+    (x, i, a) => a.map((e) => e.text).indexOf(x.text) == i
+  );
+
+  return buttons;
 }

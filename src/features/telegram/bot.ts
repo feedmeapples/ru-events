@@ -1,5 +1,6 @@
 import { Bot } from "grammy";
 import { config as configEnv } from "dotenv";
+import { InlineKeyboardButton } from "grammy/out/platform.node";
 configEnv();
 
 const chatId = process.env.CHAT_ID || "";
@@ -15,14 +16,29 @@ if (!token) {
 
 export async function sendMessage(
   message: string,
-  pictureUrl: string
+  pictureUrl: string,
+  buttons: InlineKeyboardButton[]
 ): Promise<number> {
   const bot = new Bot(token);
-  const msg = await bot.api.sendPhoto(chatId, pictureUrl, { caption: message });
+  const msg = await bot.api.sendPhoto(chatId, pictureUrl, {
+    caption: message,
+    reply_markup: {
+      inline_keyboard: [buttons],
+    },
+  });
   return msg.message_id;
 }
 
-export async function updateMessage(messageId: number, message: string) {
+export async function updateMessage(
+  messageId: number,
+  message: string,
+  buttons: InlineKeyboardButton[]
+) {
   const bot = new Bot(token);
-  await bot.api.editMessageCaption(chatId, messageId, { caption: message });
+  await bot.api.editMessageCaption(chatId, messageId, {
+    caption: message,
+    reply_markup: {
+      inline_keyboard: [buttons],
+    },
+  });
 }
