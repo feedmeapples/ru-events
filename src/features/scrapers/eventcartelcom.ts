@@ -7,6 +7,7 @@ import {
   validateEvent,
 } from "./utils";
 
+const _name = "EventCartel";
 const _url = "https://eventcartel.com";
 
 export async function getEvents(): Promise<Event[]> {
@@ -73,7 +74,7 @@ export async function scrapeEventPage(url: string): Promise<Event> {
     date = new Date(year, month, day).toISOString();
   }
 
-  const event: Event = { title, image, date, city, url, publisher: _url };
+  const event: Event = { title, image, date, city, url, publisher: _name };
 
   return event;
 }
@@ -106,7 +107,7 @@ export async function scrapeTourPage(url: string): Promise<Event[]> {
     city: e.city,
     date: e.date,
     url,
-    publisher: _url,
+    publisher: _name,
   }));
 
   return events;

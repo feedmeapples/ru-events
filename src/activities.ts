@@ -1,4 +1,7 @@
-import { generatePromoText } from "./features/generatePromo";
+import {
+  generatePromoButtons,
+  generatePromoText,
+} from "./features/generatePromo";
 import { fetchEventsEventCartel } from "./features/scrapers";
 import { sendMessage, updateMessage } from "./features/telegram/bot";
 import { Event } from "./models";
@@ -7,9 +10,11 @@ export async function fetchEvents(): Promise<Event[]> {
   return await fetchEventsEventCartel();
 }
 export async function sendTelegramMessage(events: Event[]): Promise<number> {
-  const message = generatePromoText(events);
   const pictureUrl = events?.[0].image;
-  return await sendMessage(message, pictureUrl);
+  const message = generatePromoText(events);
+  const buttons = generatePromoButtons(events);
+
+  return await sendMessage(message, pictureUrl, buttons);
 }
 
 export async function updateTelegramMessage(
@@ -17,5 +22,7 @@ export async function updateTelegramMessage(
   events: Event[]
 ) {
   const message = generatePromoText(events);
-  return await updateMessage(messageId, message);
+  const buttons = generatePromoButtons(events);
+
+  return await updateMessage(messageId, message, buttons);
 }
