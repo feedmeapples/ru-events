@@ -37,6 +37,9 @@ export async function publishTourWorkflow(event: Event): Promise<void> {
   setHandler(eventsQuery, () => events);
 
   while (!expired) {
+    const untilNextPublish = msUntilNextPublish(); 
+    await sleep(untilNextPublish);
+
     const anyNewEvent = events.some((e) => !e.isPublished);
     if (anyNewEvent) {
       if (messageId) {
@@ -49,7 +52,6 @@ export async function publishTourWorkflow(event: Event): Promise<void> {
     }
 
     expired = events.every((e) => new Date(e.date) < new Date());
-    await sleep("10 minute");
   }
 
   function publishEvent(event: Event) {
@@ -84,4 +86,10 @@ function findEvent(event: Event, events: Event[]): Event | null {
   }
 
   return null;
+}
+
+function msUntilNextPublish() {
+  const publishTime = 23 * 60 * 60 * 1000 // 23:00 GMT - 6pm EST
+  const msInDay = 24 * 60 * 60 * 1000
+  return publishTime - new Date().getTime() % msInDay;
 }
