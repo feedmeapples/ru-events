@@ -3,11 +3,11 @@ import {
   defineQuery,
   defineSignal,
   setHandler,
+  sleep,
 } from "@temporalio/workflow";
 
 import * as activities from "../activities";
 import { Event } from "../models";
-import { sleep } from "../features/sleep";
 import { validateEvent } from "../features/scrapers/utils";
 
 interface TelegramEvent extends Event {
@@ -17,9 +17,9 @@ interface TelegramEvent extends Event {
 const { sendTelegramMessage, updateTelegramMessage } = proxyActivities<
   typeof activities
 >({
-  startToCloseTimeout: "1 minutes",
+  startToCloseTimeout: "10 seconds",
   retry: {
-    initialInterval: "1m",
+    initialInterval: "1 minute",
     maximumAttempts: 10,
   },
 });
@@ -49,7 +49,7 @@ export async function publishTourWorkflow(event: Event): Promise<void> {
     }
 
     expired = events.every((e) => new Date(e.date) < new Date());
-    sleep(30);
+    await sleep("10 minute");
   }
 
   function publishEvent(event: Event) {

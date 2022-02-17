@@ -4,6 +4,7 @@ import {
   getExternalWorkflowHandle,
   setHandler,
   defineQuery,
+  sleep,
 } from "@temporalio/workflow";
 
 import { Event, Tour } from "../models";
@@ -12,12 +13,11 @@ import {
   publishEventSignal,
   publishTourWorkflow,
 } from "./publish-tour-workflow";
-import { sleep } from "../features/sleep";
 import { isSameTour, cleanText } from "../features/similarity";
 import { randString } from "../features/randString";
 
 const { fetchEvents } = proxyActivities<typeof activities>({
-  startToCloseTimeout: "30 minutes",
+  startToCloseTimeout: "1 minute",
 });
 
 export const toursQuery = defineQuery<Tour[]>("tours");
@@ -35,7 +35,6 @@ export async function ruEventsWorkflow(): Promise<void> {
       if (t) {
         try {
           const wf = getExternalWorkflowHandle(t.workflow.id);
-
           await wf.signal(publishEventSignal, event);
         } catch (err) {
           console.error(err);
@@ -54,7 +53,7 @@ export async function ruEventsWorkflow(): Promise<void> {
       }
     }
 
-    await sleep(100);
+    await sleep("1 hour");
   }
 }
 
