@@ -15,6 +15,9 @@ import {
 } from "./publish-tour-workflow";
 import { isSameTour, cleanText } from "../features/similarity";
 import { randString } from "../features/randString";
+import { SourceType } from "../features/scrapers";
+
+export const sources: SourceType[] = ["EventCartel"];
 
 const { fetchEvents } = proxyActivities<typeof activities>({
   startToCloseTimeout: "1 minute",
@@ -28,7 +31,10 @@ export async function ruEventsWorkflow(): Promise<void> {
   setHandler(toursQuery, () => tours);
 
   while (true) {
-    const events = await fetchEvents();
+    const events: Event[] = [];
+    for (let source of sources) {
+      events.push(...(await fetchEvents(source)));
+    }
 
     for (const event of events) {
       const t = findTourByEvent(event, tours);
