@@ -1,9 +1,30 @@
-import { Worker } from "@temporalio/worker";
-import * as activities from './activities';
+import { Worker, Core } from "@temporalio/worker";
+import { getConfig } from "./features/config";
+import * as activities from "./activities";
 
 async function run() {
+  const cfg = getConfig();
+
+  let tls;
+  if (cfg.cert && cfg.key) {
+    tls = {
+      clientCertPair: {
+        crt: cfg.cert,
+        key: cfg.key,
+      },
+    };
+  }
+
+  await Core.install({
+    serverOptions: {
+      address: cfg.temporalAddress,
+      namespace: cfg.namespace,
+      tls,
+    },
+  });
+
   const worker = await Worker.create({
-    workflowsPath: require.resolve('./workflows/index'),
+    workflowsPath: require.resolve("./workflows/index"),
     activities,
     taskQueue: "ru-events",
   });
