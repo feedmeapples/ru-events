@@ -2,13 +2,18 @@ import {
   generatePromoButtons,
   generatePromoText,
 } from "./features/generatePromo";
-import { fetchEventsEventCartel } from "./features/scrapers";
+import {
+  getScraperStrategy,
+  SourceType,
+} from "./features/scrapers/scrapeFactory";
 import { sendMessage, updateMessage } from "./features/telegram/bot";
 import { Event } from "./models";
 
-export async function fetchEvents(): Promise<Event[]> {
-  return await fetchEventsEventCartel();
+export async function fetchEvents(source: SourceType): Promise<Event[]> {
+  const fetchEventsFromSource = getScraperStrategy(source);
+  return await fetchEventsFromSource();
 }
+
 export async function sendTelegramMessage(events: Event[]): Promise<number> {
   const pictureUrl = events?.[0].image;
   const message = generatePromoText(events);
