@@ -1,16 +1,14 @@
 import { Bot } from "grammy";
-import { config as configEnv } from "dotenv";
 import { InlineKeyboardButton } from "grammy/out/platform.node";
-configEnv();
+import { getConfig } from "../config";
 
-const chatId = process.env.CHAT_ID || "";
-const token = process.env.TELEGRAM_TOKEN || "";
+const cfg = getConfig();
 
-if (!chatId) {
+if (!cfg.tgChatId) {
   throw new Error("CHAT_ID is not defined");
 }
 
-if (!token) {
+if (!cfg.tgToken) {
   throw new Error("TELEGRAM_TOKEN is not defined");
 }
 
@@ -19,8 +17,8 @@ export async function sendMessage(
   pictureUrl: string,
   buttons: InlineKeyboardButton[]
 ): Promise<number> {
-  const bot = new Bot(token);
-  const msg = await bot.api.sendPhoto(chatId, pictureUrl, {
+  const bot = new Bot(cfg.tgToken);
+  const msg = await bot.api.sendPhoto(cfg.tgChatId, pictureUrl, {
     caption: message,
     reply_markup: {
       inline_keyboard: [buttons],
@@ -34,8 +32,8 @@ export async function updateMessage(
   message: string,
   buttons: InlineKeyboardButton[]
 ) {
-  const bot = new Bot(token);
-  await bot.api.editMessageCaption(chatId, messageId, {
+  const bot = new Bot(cfg.tgToken);
+  await bot.api.editMessageCaption(cfg.tgChatId, messageId, {
     caption: message,
     reply_markup: {
       inline_keyboard: [buttons],

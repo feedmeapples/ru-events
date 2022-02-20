@@ -62,7 +62,7 @@ export async function publishTourWorkflow(event: Event): Promise<void> {
         events.push(event);
       }
     } catch (err) {
-      console.warn(err);
+      console.warn((err as Error).message);
     }
   }
 }

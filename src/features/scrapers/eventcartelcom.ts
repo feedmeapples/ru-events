@@ -27,7 +27,7 @@ export async function getEvents(): Promise<Event[]> {
           validateEvent(tourEvent);
           events.push(tourEvent);
         } catch (err) {
-          console.warn(err);
+          console.warn((err as Error).message);
         }
       }
     }
