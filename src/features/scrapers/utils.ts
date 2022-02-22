@@ -1,4 +1,4 @@
-import { cities, City, months, Event } from "../../models";
+import { cities, City, months, Event, Month } from "../../models";
 
 export function extractCity(address: string): City | null {
   for (const cityName in cities) {
@@ -45,18 +45,19 @@ export function extractDateValues(dateRaw: string): {
   // extract month
   let month: number | null = null;
   for (const m of months) {
-    regex = new RegExp(`\\b(${m.name}|${m.abbr})\\b`, "i");
+    regex = new RegExp(`\\b(${getMonthRegex(m)})\\b`, "i");
     match = regex.exec(dateRaw);
     if (match?.length == 2) {
       month = months.indexOf(m);
       break;
     }
   }
-  // extract day from formats Nov, Nov 12, November 12 2024, Nov 2024
+
+  // extract day from formats Nov, Nov 12, July 31st 2024, Nov 2024
   let day: number | null = null;
   if (month != null) {
     const m = months[month];
-    regex = new RegExp(`\\b(${m.name}|${m.abbr})\\s(\\d{1,2})\\b`, "i");
+    regex = new RegExp(`\\b(${getMonthRegex(m)})\\s(\\d{1,2})[a-z]{0,2}\\b`, "i");
     match = regex.exec(dateRaw);
     day = parseInt(match?.[2] || "");
   }
@@ -102,4 +103,12 @@ export function validateEvent(event: Event) {
   if (!event.publisher) {
     throw new Error(`event publisher is not set. URL: ${event.url}`);
   }
+}
+
+function getMonthRegex(month: Month) {
+  return month.variants
+    .reduce((acc, curr) => {
+      return acc + `|${curr}`;
+    }, "")
+    .replace(/^\|/, "");
 }

@@ -36,7 +36,7 @@ export async function getEvents(): Promise<Event[]> {
   return events;
 }
 
-async function scrapeEventUrls(): Promise<string[]> {
+export async function scrapeEventUrls(): Promise<string[]> {
   const { data } = await scrapeIt.default(`${_url}/events/`, {
     events: {
       listItem: ".all-events-item",
