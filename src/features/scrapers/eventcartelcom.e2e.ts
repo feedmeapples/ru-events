@@ -1,6 +1,17 @@
-import { scrapeEventPage, getEvents, scrapeTourPage } from "./eventcartelcom";
+import {
+  scrapeEventPage,
+  getEvents,
+  scrapeTourPage,
+  scrapeEventUrls,
+} from "./eventcartelcom";
 
 describe("eventcartel.com", () => {
+  test("extracts URLs for events pages", async () => {
+    const urls = await scrapeEventUrls();
+
+    expect(urls.length).toBeTruthy();
+  });
+
   test("eventcartel.com events not empty", async () => {
     const events = await getEvents();
 
