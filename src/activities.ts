@@ -5,7 +5,7 @@ import {
 import {
   getScraperStrategy,
   SourceType,
-} from "./features/scrapers/scrapeFactory";
+} from "./features/scrapers";
 import { sendMessage, updateMessage } from "./features/telegram/bot";
 import { Event } from "./models";
 
