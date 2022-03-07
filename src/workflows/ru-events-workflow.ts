@@ -17,7 +17,7 @@ import { isSameTour, cleanText } from "../features/similarity";
 import { randString } from "../features/randString";
 import { SourceType } from "../features/scrapers";
 
-export const sources: SourceType[] = ["EventCartel"];
+export const sources: SourceType[] = ["EventCartel", "Bomond"];
 
 const { fetchEvents } = proxyActivities<typeof activities>({
   startToCloseTimeout: "1 minute",
