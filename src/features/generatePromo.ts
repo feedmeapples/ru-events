@@ -14,7 +14,13 @@ export function generatePromoText(events: Event[]) {
     const day = date.getDate();
     const monthIdx = date.getMonth();
     const month = months[monthIdx].abbr;
-    eventsTxt.push(`${event.city?.icon} ${month}. ${day} ${event.city?.name}`);
+
+    const eventTxt = `${event.city?.icon} ${month}. ${day} ${event.city?.name}`;
+    if (eventsTxt.includes(eventTxt)) {
+      continue;
+    }
+
+    eventsTxt.push(eventTxt);
   }
 
   return `✨${title}\n\n${eventsTxt.join("\n")}\n\n🎫 Билеты:`;
