@@ -1,4 +1,4 @@
-import { Worker, Core } from "@temporalio/worker";
+import { Worker, NativeConnection } from "@temporalio/worker";
 import { getConfig } from "./features/config";
 import * as activities from "./activities";
 
@@ -15,17 +15,16 @@ async function run() {
     };
   }
 
-  await Core.install({
-    serverOptions: {
-      address: cfg.temporalAddress,
-      namespace: cfg.namespace,
-      tls,
-    },
+  const connection = await NativeConnection.create({
+    address: cfg.temporalAddress,
+    tls,
   });
 
   const worker = await Worker.create({
+    connection,
     workflowsPath: require.resolve("./workflows/index"),
     activities,
+    namespace: cfg.namespace,
     taskQueue: "ru-events",
   });
   await worker.run();
