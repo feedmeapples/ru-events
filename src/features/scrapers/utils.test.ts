@@ -1,6 +1,6 @@
 import { extractDateValues } from "./utils";
 
-describe("extracting date", () => {
+describe(extractDateValues, () => {
   beforeAll(() => {
     jest.setSystemTime(new Date("2020-05-20"));
   });

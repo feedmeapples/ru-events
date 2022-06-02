@@ -1,7 +1,7 @@
 import { cleanText, isSameTour } from "./similarity";
 
-describe("cleanText", () => {
-  test("should conver cyrillic to latin", () => {
+describe(cleanText, () => {
+  test("should convert cyrillic to latin", () => {
     const res = cleanText(
       "комбинированные материалы в которых применена щадящая оптимизация"
     );
@@ -21,7 +21,7 @@ describe("cleanText", () => {
   });
 });
 
-describe("isSameTour", () => {
+describe(isSameTour, () => {
   test("should return true", () => {
     const text1 = 'тимур шаов usa tour 2021'
     const text2 = "ТИМУР бб .   2 11 ШАОВ"
