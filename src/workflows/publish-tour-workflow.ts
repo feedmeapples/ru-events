@@ -89,6 +89,8 @@ function findEvent(event: Event, events: Event[]): Event | null {
 }
 
 function msUntilNextPublish() {
+  return 1 * 60 * 1000 
+
   const publishTime = 23 * 60 * 60 * 1000 // 23:00 GMT - 6pm EST
   const msInDay = 24 * 60 * 60 * 1000
   return publishTime - new Date().getTime() % msInDay;

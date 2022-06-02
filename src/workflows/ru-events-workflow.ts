@@ -5,10 +5,12 @@ import {
   setHandler,
   defineQuery,
   sleep,
+  proxySinks,
 } from "@temporalio/workflow";
 
 import { Event, Tour } from "../models";
 import * as activities from "../activities";
+import { LoggerSinks } from "./definitions";
 import {
   publishEventSignal,
   publishTourWorkflow,
@@ -18,6 +20,8 @@ import { randString } from "../features/randString";
 import { SourceType } from "../features/scrapers";
 
 export const sources: SourceType[] = ["EventCartel", "Bomond"];
+
+const { logger } = proxySinks<LoggerSinks>();
 
 const { fetchEvents } = proxyActivities<typeof activities>({
   startToCloseTimeout: "1 minute",
@@ -43,7 +47,7 @@ export async function ruEventsWorkflow(): Promise<void> {
           const wf = getExternalWorkflowHandle(t.workflow.id);
           await wf.signal(publishEventSignal, event);
         } catch (err) {
-          console.error(err);
+          logger.error(`unable to signal ${t.workflow.id}: ${err}`);
         }
       } else {
         const workflowId = `${convertToId(event.title)}-${randString(4)}`;
@@ -59,7 +63,7 @@ export async function ruEventsWorkflow(): Promise<void> {
       }
     }
 
-    await sleep("1 hour");
+    await sleep("5 minutes");
   }
 }
 
