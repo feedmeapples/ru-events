@@ -1,8 +1,10 @@
-import { Worker, NativeConnection } from "@temporalio/worker";
+import { Worker, NativeConnection, InjectedSinks } from "@temporalio/worker";
 import { getConfig } from "./features/config";
 import * as activities from "./activities";
+import { LoggerSinks } from './workflows';
 
-async function run() {
+
+async function main() {
   const cfg = getConfig();
 
   let tls;
@@ -20,17 +22,38 @@ async function run() {
     tls,
   });
 
+  const sinks: InjectedSinks<LoggerSinks> = {
+    logger: {
+      info: {
+        fn(workflowInfo, message) {
+          console.log('workflow: ', workflowInfo.runId, 'message: ', message);
+        },
+        callDuringReplay: false,
+      },
+      error: {
+        fn(workflowInfo, message) {
+          console.error('workflow: ', workflowInfo.runId, 'message: ', message);
+        },
+        callDuringReplay: false,
+      },
+    },
+  };
+
   const worker = await Worker.create({
     connection,
     workflowsPath: require.resolve("./workflows/index"),
     activities,
     namespace: cfg.namespace,
     taskQueue: "ru-events",
+    sinks
   });
   await worker.run();
 }
 
-run().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+main().then(
+  () => void process.exit(0),
+  (err) => {
+    console.error(err);
+    process.exit(1);
+  }
+);
